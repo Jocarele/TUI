@@ -1,3 +1,7 @@
+import bancos
+import mySQLdb
+import postgre
+import SQLite
 
   def main():
     pass
