@@ -66,6 +66,14 @@ class postgre_class(banco):
     def set_db(self):
         self.db = psycopg.connect(host =self.host,user = self.username, password = self.password, database = self.database)
 
+
+    def instruction (self,sql):
+        sql_split = sql.split()
+        if(sql_split[0].lower() == "select"):
+            self.queries(self,sql)
+        else:
+            self.att(self,sql)
+
        
     
 
