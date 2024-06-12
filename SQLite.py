@@ -3,7 +3,7 @@ from bancos import banco
 
 class SQLite_class(banco):
 
-    def __init__(self,host,username,password,database):
+     def __init__(self,host,username,password,database):
         self.username = username
         self.host = host
         self.password = password
@@ -15,7 +15,7 @@ class SQLite_class(banco):
         return self.cursor
 
     def set_cursor(self):
-        self.cursor = self.db.cursor()
+        self.cursor = self.db.cursor(cursor_factory=DictCursor)
         
     def get_db(self):
         return self.db
@@ -39,17 +39,41 @@ class SQLite_class(banco):
     #def set_database(self):
     #    pass
 
-    def queries(self):
-        pass
+     def queries(self,sql):
+        try:
+            self.cursor.execute(sql)
+            data =self.cursor.fetchall()
+            total_fields = self.cursor.description  
+            for reg in data:
+                stiring = ""    
+                for i in total_fields:
+                    stiring += " " + str(i[0]) + " = " + str(reg[i[0]])
+                print(stiring)
+        except:
+            print("VERIFIQUE O SQL NOVAMENTE")
 
-    def att(self):
-        pass
+    def att(self,sql):
+        try:
+            tuplas_afetadas = self.cursor.execute(sql)
+            print("foram afetadas " + tuplas_afetadas + " tuplas")
+            self.db.commit()
+        except:
+            self.db.rollback()
+            print("VERIFIQUE O SQL NOVAMENTE")
+
 
     
     def set_db(self):
         self.db = sqlite3.connect(host =self.host,user = self.username, password = self.password, database = self.database)
 
+
+    def instruction (self,sql):
+        sql_split = sql.split()
+        if(sql_split[0].lower() == "select"):
+            self.queries(self,sql)
+        else:
+            self.att(self,sql)
+
        
     
-
-
+    
