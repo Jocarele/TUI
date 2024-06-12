@@ -53,7 +53,13 @@ class mySQLdb_class(banco):
             print("VERIFIQUE O SQL NOVAMENTE")
 
     def att(self):
-        pass
+        try:
+            tuplas_afetadas = self.cursor.execute(sql)
+            print("foram afetadas " + tuplas_afetadas + " tuplas")
+            self.db.commit()
+        except:
+            self.db.reroll()
+            print("VERIFIQUE O SQL NOVAMENTE")
 
     
     def set_db(self):
