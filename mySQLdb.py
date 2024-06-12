@@ -65,7 +65,7 @@ class mySQLdb_class(banco):
     def set_db(self):
         self.db = MySQLdb.connect(host =self.host,user = self.username, password = self.password, database = self.database)
 
-    def instruction (self,sql)
+    def instruction (self,sql):
         sql_split = sql.split()
         if(sql_split[0].lower() == "select"):
             self.queries(self,sql)
