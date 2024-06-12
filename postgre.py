@@ -15,7 +15,7 @@ class postgre_class(banco):
         return self.cursor
 
     def set_cursor(self):
-        self.cursor = self.db.cursor()
+        self.cursor = self.db.cursor(cursor_factory=DictCursor)
         
     def get_db(self):
         return self.db
@@ -39,11 +39,28 @@ class postgre_class(banco):
     #def set_database(self):
     #    pass
 
-    def queries(self):
-        pass
+     def queries(self,sql):
+        try:
+            self.cursor.execute(sql)
+            data =self.cursor.fetchall()
+            total_fields = self.cursor.description  
+            for reg in data:
+                stiring = ""    
+                for i in total_fields:
+                    stiring += " " + str(i[0]) + " = " + str(reg[i[0]])
+                print(stiring)
+        except:
+            print("VERIFIQUE O SQL NOVAMENTE")
 
-    def att(self):
-        pass
+    def att(self,sql):
+        try:
+            tuplas_afetadas = self.cursor.execute(sql)
+            print("foram afetadas " + tuplas_afetadas + " tuplas")
+            self.db.commit()
+        except:
+            self.db.rollback()
+            print("VERIFIQUE O SQL NOVAMENTE")
+
 
     
     def set_db(self):
