@@ -15,7 +15,7 @@ class SQLite_class(banco):
         return self.cursor
 
     def set_cursor(self):
-        self.cursor = self.db.cursor(cursor_factory=DictCursor)
+        self.cursor = self.db.cursor()
         
     def get_db(self):
         return self.db
@@ -40,15 +40,27 @@ class SQLite_class(banco):
     #    pass
 
      def queries(self,sql):
-        try:
-            self.cursor.execute(sql)
-            data =self.cursor.fetchall()
-            total_fields = self.cursor.description  
-            for reg in data:
-                stiring = ""    
-                for i in total_fields:
-                    stiring += " " + str(i[0]) + " = " + str(reg[i[0]])
-                print(stiring)
+          try:
+               self.cursor.execute(sql)
+               cursor_lite.execute("SELECT * from configuracoes;")
+               data = cursor_lite.fetchall()
+
+               i=0
+               ID = []
+               host = []
+               username = []
+               senha = []
+               database = []
+               
+               for registro in data:
+                     ID.append(str(registro[0]))
+                     host.append(registro[1])
+                     username.append(registro[2])
+                     senha.append(registro[3])
+                     database.append(registro[4])
+                     print("ID = "+ID[i]+", Host = "+host[i]+", Username = "+username[i]+", Senha = "+senha[i]+", Database = "+database[i]+ "\n")
+                     i+=1
+                   
         except:
             print("VERIFIQUE O SQL NOVAMENTE")
 
