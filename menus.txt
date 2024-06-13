@@ -1,0 +1,20 @@
+# 1º
+# menu 1 -- conexoes
+Conexoes (selecione uma das opcoes):
+0 - Criar nova conexao
+1 - univ
+2 - tpch
+S - Sair
+Digite a opcao:
+
+__--='=--__
+
+# 2º
+# menu 2 -- funcoes
+Digite oq quer fazer:
+1 - listar estrutura em arvre        # leva a um submenu que lista tabelas e views
+2 - buscar dados de uma tabela/view  # select simplao na tabela # perguntar se quer exportar em CSV
+3 - executar query                   # jaguara escreve a query  # perguntar se quer exportar em CSV
+4 - Config                           # configurar qtde de regs
+5 - Sair                             # sai
+Digite a opcao:
