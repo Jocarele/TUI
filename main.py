@@ -48,11 +48,12 @@ def menu2():
   if len(g_erro) > 0:
     print(f"\n\tERRO: {g_erro}\n")
 
+  print(" 0 - Voltar")
   print(" 1 - listar estrutura da base")
   print(" 2 - buscar dados de uma tabela/view")
   print(" 3 - executar query")
   print(" 4 - Configuracoes")
-  print("-1 - Sair")
+  print("-1 - Sair ")
   print("\nSelecione uma das opcoes: ")
 
 #
@@ -122,7 +123,9 @@ def main():
   global g_connectionsTUI
   global g_SQLite
   global g_erro
+  global g_limit
 
+  g_limit = 1000
   g_SQLite = SQLite(gConDataSQLite)
 
   l_op_selecionada1 = -9
@@ -157,7 +160,7 @@ def main():
 
           l_op_selecionada2 = -9
 
-          while l_op_selecionada2 != -1:
+          while l_op_selecionada2 != -1 and l_op_selecionada2 != 0:
             menu2()
             
             try : 
@@ -165,19 +168,43 @@ def main():
             except:
               g_erro = "Opção invalida"
               continue
+
             match l_op_selecionada2:
-              case -1: # sair
+              case 0: # voltar
                 l_db.closeConn()
                 l_db = None
-                pass
-              case 3:
-                students = l_db.executeQuery("select * from student limit 10;")
-
-                for s in students:
-                  print(s)
                 
+              case 3:
+
+                l_sql = ""
+                ponto_virgula = l_sql.find(";")
+                while(ponto_virgula == -1):
+                  l_sql += input("Digite a query: ") + " "
+                  ponto_virgula = l_sql.find(";")
+
+                l_sql = l_sql[0:ponto_virgula]
+                l_sql += " limit " + str(g_limit) + ";"
+                query = l_db.executeQuery(l_sql)
+
+                if(query != None):         
+                  for dict in query:   #q = dicionario query = lista
+                    for keys in dict:     #d = item do dicionario
+                      print (keys,"=", dict[keys])
+                    print()
+                  
                 print("Pressione ENTER para retornar ao menu.")
                 input()
+
+              case 4:
+                g_limit = -1
+                while (g_limit < 1):
+                  try:
+                    g_limit =int(input("Digite o novo valor para limitar o print: "))
+                  except:
+                    print ("Valor digitado invalido.")
+
+              case -1: #sair
+                exit()
 
             g_erro = ""
         else:
@@ -197,10 +224,10 @@ TODO: ... funcionalidades
   TODO: ver dados de uma certa tabela
       # listar tabelas/views da base e pedir para o usuario selecionar
 
-  TODO: executar SQL (consultas apenas)
+  TODO: executar SQL (consultas apenas) FOI
       # 50% feito, falta formatar saída e tratar erros
 
-  TODO: configurar limite de print
+  TODO: configurar limite de print FOI
 
   TODO: exportar dados em CSV
       # postgresql -> usar COPY

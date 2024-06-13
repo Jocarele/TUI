@@ -43,7 +43,8 @@ class Banco(ABC):
         return list
       except:
         print("Erro ao executar query. (1)(" + self.DBMSName + ")\nQuery: " + query)
-        exit (1)
+        return None
+        #exit (1)
     else:
       try:
         self.cursor.execute(query)
