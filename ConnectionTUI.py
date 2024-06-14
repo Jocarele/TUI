@@ -26,4 +26,4 @@ class ConnectionTUI():
     return self.dbms
 
   def __str__(self):
-    return f"{self.username}@{self.host} [{self.database}]"
+    return f"{self.database} ({('MySQL' if self.dbms == 1 else 'PostgreSQL')}) [{self.username}@{self.host}]"

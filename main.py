@@ -1,4 +1,5 @@
 from os import system
+import readline
 from MySQLdb_tui import MySQLdb_tui
 from PostgreSQL import PostgreSQL
 from SQLite import SQLite
@@ -16,6 +17,7 @@ g_SQLite = None
 g_connectionsTUI = []
 
 g_erro = ""
+g_info = ""
 
 #
 # menu inicial -> exibe 'Conexoes'
@@ -29,6 +31,7 @@ def menu1():
 
   if len(g_erro) > 0:
     print(f"\n\tERRO: {g_erro}\n")
+    print("====================================")
 
   print("Conexoes: ")
   print(" 0 - Criar nova conexao")
@@ -44,12 +47,18 @@ def menu1():
 #
 def menu2():
   global g_erro
+  global g_info
   
   system("clear")
   print("====================================")
 
   if len(g_erro) > 0:
     print(f"\n\tERRO: {g_erro}\n")
+    print("====================================")
+
+  if len(g_info) > 0:
+    print(f"\n\t{g_info}\n")
+    print("====================================")
 
   print(" 0 - Voltar")
   print(" 1 - listar estrutura da base")
@@ -71,6 +80,7 @@ def menu3():
 
   if len(g_erro) > 0:
     print(f"\n\tERRO: {g_erro}\n")
+    print("====================================")
 
   l_tam = len(g_no.children)
   print(" 0 - Voltar")
@@ -145,12 +155,9 @@ def addConnectionTUI():
 #
 #
 #
-def crateTree():
+def createTree():
   global g_db
   global g_no
-  
-
- 
 
   if(g_db.getConData().getDBMS()==1):
     l_lista = g_db.executeQuery("SELECT t.table_name AS tabela, group_concat(concat(c.column_name,' - ',c.data_type)) AS campos FROM information_schema.tables t JOIN information_schema.columns c ON (t.table_name = c.table_name) WHERE t.table_schema = 'university' GROUP BY t.table_name;") 
@@ -159,21 +166,24 @@ def crateTree():
 
   g_no = Node(g_db.getConData().getDatabase())
   j=0
+
   for l_dict in l_lista:
     l_key = list(l_dict.keys())
     l_listaValue = l_dict[l_key[1]]
     valueSplit = l_listaValue.split(",")
     g_no.makeChildren(Node(l_dict[l_key[0]]))
+
     for value in valueSplit:
       g_no.children[j].makeChildren(Node(value))
+
     j +=1
 
 #  
 #  
 #  
 def tabelizar(l_query):
-  if(l_query == None):
-    pass
+  global g_erro
+
   l_tableDict = {}
   l_listaChaves = list(l_query[0].keys())
 
@@ -182,7 +192,8 @@ def tabelizar(l_query):
   
   for dict in l_query:
     for key in dict:
-      l_tableDict[key].append(dict[key]) 
+      l_tableDict[key].append(dict[key])
+
   print(tabulate(l_tableDict, headers="keys",tablefmt="presto"))  
 
 #
@@ -218,6 +229,7 @@ def main():
   global g_connectionsTUI
   global g_SQLite
   global g_erro
+  global g_info
   global g_limit
   global g_no
   global g_db
@@ -232,6 +244,7 @@ def main():
 
   while l_op_selecionada1 != -1:
     g_connectionsTUI = readConnectionsTUI()
+
     menu1()
 
     try:
@@ -245,9 +258,10 @@ def main():
     match l_op_selecionada1:
       case 0: # cadastrar nova conexao
         addConnectionTUI()
-        pass
+
       case -1: # sair
         pass
+
       case _: # selecionou algum dos bancos
         if (l_op_selecionada1 >= 1 and l_op_selecionada1 <= len(g_connectionsTUI)):
           # TODO: [low] colocar em uma funcao separada
@@ -264,7 +278,8 @@ def main():
             l_op_selecionada1 = -9
             continue
 
-          crateTree()
+          # le a estrutura da base ao conectar
+          createTree()
 
           l_op_selecionada2 = -9
 
@@ -284,8 +299,10 @@ def main():
 
               case 1: # mostra estrutura em arvore
                 system("clear")
+                print("====================================")
+                print("Estrutura da base: ")
                 print(g_no)
-                print ("\nPressione ENTER para voltar ao menu...")
+                print ("Pressione ENTER para voltar ao menu...")
                 input()
 
               case 2: # listar dados de uma tabela
@@ -296,6 +313,10 @@ def main():
                     l_op_selecionada3 =int(input())
                   except:
                     g_erro = "Opção invalida"
+                    continue
+
+                  g_erro = ""
+                  g_info = ""
                   
                   match l_op_selecionada3:
                     case 0:
@@ -303,19 +324,30 @@ def main():
                     case -1:
                       exit()
                     case _:
-                      tam = len(g_no.children)+1
+                      tam = len(g_no.children) + 1
+
                       if (l_op_selecionada3 >= 1 and l_op_selecionada3 <= tam):
                         lista3 = g_db.executeQuery("select * from "+ g_no.children[l_op_selecionada3-1].value + " limit " +str(g_limit)+";")
-                        tabelizar(lista3)
-                        print("Pressione ENTER para voltar ao menu...")
-                        input()
+
+                        if (len(lista3) > 0):
+                          system("clear")
+                          print(f"================== {g_no.children[l_op_selecionada3-1].value} ==================")                
+                          tabelizar(lista3)
+                          print("\nPressione ENTER para voltar ao menu...")
+                          input()
+                        else:
+                          g_info = "Query sem resultados"
+                          continue
                       else:
                         g_erro = "Opção selecionada é invalida"
                         continue
+
               case 3: # executar SQL
                 l_sql = ""
                 l_ponto_virgula = l_sql.find(";")
-                
+
+                system("clear")
+                print("====================================")
                 print("Digite a query: ")
                 
                 while(l_ponto_virgula == -1):
@@ -324,16 +356,21 @@ def main():
 
                 l_sql = l_sql[0:l_ponto_virgula]
                 l_sql += " limit " + str(g_limit) + ";"
+
                 query = g_db.executeQuery(l_sql)
 
-                if(query != None):
+                if(len(query) > 0):
                   tabelizar(query)
 
-                  print("Deseja salvar em CSV: ")
-                  salvar =input("s para sim ")
-                  if(salvar == "s"):
+                  print("\n---===---\nDeseja salvar em CSV? (S - SIM)")
+                  salvar = input()
+
+                  if(salvar == "s" or salvar == "S"):
                     exportCSV(query, f"query-{g_counter}.csv")
                     g_counter += 1
+                else:
+                  g_info = "Query sem resultados"
+                  continue
 
                 print("Pressione ENTER para retornar ao menu.")
                 input()
