@@ -1,16 +1,18 @@
 from os import system
 import readline
+
+from ConnectionTUI import ConnectionTUI
+from node import Node
+
 from MySQLdb_tui import MySQLdb_tui
 from PostgreSQL import PostgreSQL
 from SQLite import SQLite
-from ConnectionTUI import ConnectionTUI
-from node import Node
+
 from tabulate import tabulate
 
 #
 # Variaveis globais
 #
-# TODO: [low] listar todas as variaveis globais aqui
 gConDataSQLite = ConnectionTUI(None, None, None, None, "tui.db", None)
 g_SQLite = None
 
@@ -50,7 +52,7 @@ def menu2():
   global g_info
   
   system("clear")
-  print("====================================")
+  print(f"================== {g_db.getConData()} ==================")
 
   if len(g_erro) > 0:
     print(f"\n\tERRO: {g_erro}\n")
@@ -70,7 +72,7 @@ def menu2():
   print("\nSelecione uma das opcoes: ")
 
 #
-# submenu ~ lista tabelas
+# menu ~ lista tabelas
 #
 def menu3():
   global g_erro
@@ -84,6 +86,7 @@ def menu3():
 
   l_tam = len(g_no.children)
   print(" 0 - Voltar")
+
   for i in range(0,l_tam):
     print(f"{str(i+1):>2} - {g_no.children[i].value}")
   
@@ -91,7 +94,7 @@ def menu3():
   print("\nSelecione uma das opcoes: ")
   
 #
-#
+# le conexoes salvas na base SQLite local
 #
 def readConnectionsTUI():
   global g_SQLite
@@ -114,7 +117,7 @@ def readConnectionsTUI():
   return listaObjs
 
 #
-#
+# rotina para adicioanr novas conexoes na base local SQLite
 #
 def addConnectionTUI():
   global g_erro
@@ -138,8 +141,7 @@ def addConnectionTUI():
 
     l_database = input()
 
-    # TODO: [low] verificar se é uma conexao valida
-
+    # TODO: verificar se é uma conexao valida [low]
     l_query = f"INSERT INTO conexao (host, username, password, database, dbms) VALUES ('{l_host}', '{l_username}', '{l_password}', '{l_database}', {l_dbms})"
 
     l_result = g_SQLite.executeQuery(l_query)
@@ -203,24 +205,25 @@ def exportCSV(p_rows, p_file):
   global g_no
   global g_db
 
-  # busca os dados da tabela
-  # rows = g_db.executeQuery(p_query)
-
   if (len(p_rows) > 0):
     # escreve no arq
     with open(p_file, 'w') as writer:
       # printa nome das colunas
       for col in list(p_rows[0].keys()):
         writer.write(f"{col};")
+
       writer.write("\n")
       
       # printa os dados
       for r in p_rows:
         for v in list(r.values()):
           writer.write(f"{str(v)};")
+
         writer.write("\n")
+
       system("clear")
-      print(f"Arquivo {p_file} criado!")
+      print("====================================")
+      print(f"Arquivo {p_file} criado!\n")
 
 #
 # funcao principal
@@ -322,7 +325,7 @@ def main():
                     case 0:
                       pass
                     case -1:
-                      exit()
+                      exit(0)
                     case _:
                       tam = len(g_no.children) + 1
 
@@ -399,6 +402,8 @@ def main():
                   match l_op_selecionada3:
                     case 0:
                       pass
+                    case -1:
+                      exit(0)
                     case _:
                       if (l_op_selecionada3 >= 1 and l_op_selecionada3 <= len(g_no.children)):
                         l_table = g_no.children[l_op_selecionada3 - 1].value
@@ -423,11 +428,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-
-'''
-#
-# Anotacoes
-#
-TODO: printar estrutura em arvore (95%)
-    # falta: mostrar PKs e tamanho da coluna
-'''
