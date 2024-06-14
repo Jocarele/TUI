@@ -44,15 +44,17 @@ class Banco(ABC):
       except:
         print("Erro ao executar query. (1)(" + self.DBMSName + ")\nQuery: " + query)
         return None
-        #exit (1)
+        # exit (1)
     else:
       try:
         self.cursor.execute(query)
         self.DBCon.commit()
+        return self.cursor.rowcount
       except:
         self.DBCon.rollback()
         print("Erro ao executar query. (2)(" + self.DBMSName + ")\nQuery: " + query)
-        exit (1)
+        return None
+        # exit (1)
 
     return None
 

@@ -18,3 +18,18 @@ Digite oq quer fazer:
 4 - Config                           # configurar qtde de regs
 5 - Sair                             # sai
 Digite a opcao:
+
+----------------
+# esse menu vem da opc 2 no menu 2 /\
+# 3º
+lista de tabelas
+1 - takes
+2 - students
+3 ....
+
+selecione uma tabela: 1
+
+id | takes
+---+------
+1  | aaaa
+2  | bbbb
