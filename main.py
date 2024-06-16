@@ -35,6 +35,10 @@ def menu1():
     print(f"\n\tERRO: {g_erro}\n")
     print("====================================")
 
+  if len(g_info) > 0:
+    print(f"\n\t{g_info}\n")
+    print("====================================")
+
   print("Conexoes: ")
   print(" 0 - Criar nova conexao")
   
@@ -121,6 +125,7 @@ def readConnectionsTUI():
 #
 def addConnectionTUI():
   global g_erro
+  global g_info
   system("clear")
   print("============ Nova Conexao ============")
 
@@ -149,7 +154,7 @@ def addConnectionTUI():
     if (l_result == None):
       g_erro = "Nao foi possivel cadastrar!"
     else:
-      g_erro = "Nova conexao cadastrada com sucesso!"
+      g_info = "Nova conexao cadastrada com sucesso!"
 
   except:
     g_erro = "Falha ao cadastrar nova conexao."
@@ -257,6 +262,7 @@ def main():
       continue
 
     g_erro = ""
+    g_info = ""
 
     match l_op_selecionada1:
       case 0: # cadastrar nova conexao
@@ -332,7 +338,7 @@ def main():
                       if (l_op_selecionada3 >= 1 and l_op_selecionada3 <= tam):
                         lista3 = g_db.executeQuery("select * from "+ g_no.children[l_op_selecionada3-1].value + " limit " +str(g_limit)+";")
 
-                        if (len(lista3) > 0):
+                        if (lista3 != None) and (len(lista3) > 0):
                           system("clear")
                           print(f"================== {g_no.children[l_op_selecionada3-1].value} ==================")                
                           tabelizar(lista3)
@@ -358,11 +364,11 @@ def main():
                   l_ponto_virgula = l_sql.find(";")
 
                 l_sql = l_sql[0:l_ponto_virgula]
-                l_sql += " limit " + str(g_limit) + ";"
+                l_sql += ";"
 
                 query = g_db.executeQuery(l_sql)
 
-                if(len(query) > 0):
+                if (query != None) and (len(query) > 0):
                   tabelizar(query)
 
                   print("\n---===---\nDeseja salvar em CSV? (S - SIM)")
@@ -408,7 +414,7 @@ def main():
                       if (l_op_selecionada3 >= 1 and l_op_selecionada3 <= len(g_no.children)):
                         l_table = g_no.children[l_op_selecionada3 - 1].value
 
-                        l_sql = f"select * from {l_table} limit {g_limit};"
+                        l_sql = f"select * from {l_table};"
 
                         l_query = g_db.executeQuery(l_sql)
                         exportCSV(l_query, f"{l_table}.csv")
