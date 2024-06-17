@@ -1,3 +1,9 @@
+# Projeto final de BD - ICSB30 2024/1
+# Autores:
+#   Joao Lucas
+#   Lucas Marques
+#
+
 from os import system
 import readline
 
